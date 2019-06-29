@@ -304,3 +304,29 @@ def two_bucket_dr(df_train, df_test, df_tune=False, target_column='def_flag', cd
             continue
 
     return dr, suspicious_features
+
+
+def get_gini(df, clf, columns, target):
+    """
+    function to calculate gini for each column in your dataframe
+    :param df: dataFrame
+    :param clf: classificator
+    :param columns: list of columns
+    :param target: target column name
+    :return: gini dict
+    """
+    gini_dict = {}
+    t = tqdm_notebook(columns, leave=False)
+    for column in t:
+        t.set_description(f'{column} ')
+        # sub_df = df[[target, column]]
+        clf.fit(df[[column]], df[target])
+        try:
+            y_pred_train = clf.predict_proba(df[[column]])[:, 1]
+        except Exception:
+            y_pred_train = clf.predict(df[[column]])
+
+        roc_auc_train = roc_auc_score(df[target], y_pred_train)
+        gini_dict[column] = (2 * roc_auc_train - 1) * 100
+
+    return gini_dict
