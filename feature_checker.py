@@ -167,13 +167,14 @@ def add_value_order(df_train, df_test, df_tune, cols_to_drop, target_column, clf
     """
 
     columns = df_train.drop(cols_to_drop, axis=1).columns
-    # new_order = []
+    new_order = []
     final_list = [('feature', 0, 0, 0)]
     gginies = []
 
     model = clf
     while len(columns) != 0:
-        for i, feature in enumerate(tqdm(columns)):
+        t = tqdm_notebook(columns, leave=False)
+        for i, feature in enumerate(t):
             model.fit(df_train[new_order + [feature]].values, df_train[target_column])
 
             y_pred_train = model.predict_proba(df_train[new_order + [feature]])[:, 1]
@@ -191,7 +192,7 @@ def add_value_order(df_train, df_test, df_tune, cols_to_drop, target_column, clf
             columns = []
         else:
             final_list.append(sorted(g_features, key=lambda x: x[1], reverse=True)[0])
-            # new_order.append(final_list[-1][0])
+            new_order.append(final_list[-1][0])
             columns = [feature for feature in columns if feature not in new_order]
             gginies = []
     return final_list[1:]

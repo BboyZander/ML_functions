@@ -41,8 +41,9 @@ def gini_distribution(*dfs, clf=False, date_column='', flag='', score_column='',
     :param cols_to_drop: list of column which wasn't in fitting
     :return: picture
     """
+    plt_ = __import__("matplotlib.pyplot")
     assert len(dfs) == len(legend), 'len(dfs) != len(legend)'
-    plt.figure(figsize=(16, 5))
+    fig, _ = plt_.pyplot.subplots(figsize=(16, 5))
     if clf:
         for df in dfs:
             try:
@@ -58,6 +59,7 @@ def gini_distribution(*dfs, clf=False, date_column='', flag='', score_column='',
             plt.plot(DF)
 
     plt.grid(alpha=0.2)
+    plt.ylabel('GINI', fontsize=20)
     plt.legend(legend, loc='best')
     plt.title('Распределение GINI в каждой выборке', fontsize=20)
     if ylim:
@@ -73,6 +75,8 @@ def dr_distribution(df_train, df_test, df_tune, research_feature, flag_column):
     :param flag_column: name of target column
     :return: picture
     """
+    plt_ = __import__("matplotlib.pyplot")
+
     dff = df_train.copy()
     dff_te = df_test.copy()
     dff_tu = df_tune.copy()
@@ -104,7 +108,7 @@ def dr_distribution(df_train, df_test, df_tune, research_feature, flag_column):
         counts_tu.append(len(sub_df) / len(dff) * 100)
         dr_tu.append(len(sub_df[sub_df[flag_column] == 1]) / len(sub_df))
 
-    fig, ax1 = plt.subplots(figsize=(15, 7))
+    fig, ax1 = plt_.pyplot.subplots(figsize=(15, 7))
     ax2 = ax1.twinx()
 
     p1 = ax1.bar(np.arange(len(counts)), counts, width=0.35, color=(24 / 254, 192 / 254, 196 / 254))
@@ -144,14 +148,16 @@ def add_value_plot(*ginies, feature_names, legend):
     :param legend: list of data frame names for the plot
     :return:
     """
+    plt_ = __import__("matplotlib.pyplot")
     assert len(ginies) == len(legend), 'len(ginies) != len(legend)'
 
-    plt.figure(figsize=(16, 9))
+    fig, _ = plt_.pyplot.subplots(figsize=(16, 9))
     for gini in ginies:
         plt.plot(range(1, len(gini) + 1), gini)
 
-    plt.ylabel('GINI')
-    plt.xlabel('Added values')
+    plt.ylabel('GINI', fontsize=20)
+    plt.xlabel('features', fontsize=20)
+    plt.title('Add value', fontsize=20)
     plt.grid(alpha=0.2)
 
     plt.legend(legend, loc='lower right')

@@ -1,9 +1,9 @@
 import operator
-import tqdm
+from tqdm import tqdm, tqdm_notebook
 from wing import WingsOfEvidence
 import pandas as pd
 
-def get_bad_features(df_train_woe, df_test_woe, df_tune_woe, tol=0.05, use_test=True):
+def get_bad_features(df_train_woe, df_test_woe, df_tune_woe, tol=0.05, use_test=True, target_column = ''):
     '''
     Function which helps you find features with non monotonic distribution by bucket
     :param tol: tolerance
@@ -11,8 +11,9 @@ def get_bad_features(df_train_woe, df_test_woe, df_tune_woe, tol=0.05, use_test=
     :return: list with bad features
     '''
     bad_features = []
-
-    for feature in df_train_woe.drop('def_flag', axis=1).columns:
+    t = tqdm_notebook(df_train_woe.drop(target_column, axis=1).columns, leave=False)
+    for feature in t:
+        t.set_description(f'{feature} ')
         dr = []
         dr_te = []
         dr_tu = []
@@ -23,15 +24,15 @@ def get_bad_features(df_train_woe, df_test_woe, df_tune_woe, tol=0.05, use_test=
 
         for value in vals:
             sub_df = df_train_woe[df_train_woe[feature] == value]
-            dr.append(len(sub_df[sub_df.def_flag == 1]) / len(sub_df))
+            dr.append(len(sub_df[sub_df[target_column] == 1]) / len(sub_df))
 
         for value in vals_te:
             sub_df = df_test_woe[df_test_woe[feature] == value]
-            dr_te.append(len(sub_df[sub_df.def_flag == 1]) / len(sub_df))
+            dr_te.append(len(sub_df[sub_df[target_column] == 1]) / len(sub_df))
 
         for value in vals_tu:
             sub_df = df_tune_woe[df_tune_woe[feature] == value]
-            dr_tu.append(len(sub_df[sub_df.def_flag == 1]) / len(sub_df))
+            dr_tu.append(len(sub_df[sub_df[target_column] == 1]) / len(sub_df))
 
         incr = 0
         decr = 0
@@ -61,19 +62,22 @@ def get_bad_features(df_train_woe, df_test_woe, df_tune_woe, tol=0.05, use_test=
 
     return bad_features
 
-def woe_rebinning(df_train, df_test, df_oot, df_tune, cols_to_drop, bad_features, tol=0.05, use_test=True):
+
+def woe_rebinning(df_train, df_test, df_oot, df_tune, cols_to_drop, bad, tol=0.05, use_test=True):
     '''
     Find best splitting for feature by buckets with monotonic distribution using wings module
 
     :param cols_to_drop:
-    :param bad_features: list of bad features
+    :param bad: list of bad features
     :param tol: tolerance
     :param use_test: do we look on test df or not
     :return: list with dataframes with new woe transformation
     '''
     drop_features = []
     df_rebinned = []
-    for woe_feature in tqdm(bad_features):
+    t = tqdm_notebook(bad, leave=False)
+    for woe_feature in t:
+        t.set_description(f'{woe_feature}')
         ginies = {}
         dfs = {}
 
@@ -152,18 +156,20 @@ def woe_rebinning(df_train, df_test, df_oot, df_tune, cols_to_drop, bad_features
 
     return df_rebinned, drop_features
 
+
 def split_from_rebinned(*df_woe, df_rebinned, good_features=[]):
     '''
     Join old df with good features with new features after rebinning
+    note: the sequence of your dfs must be the same as in df_rebinned
     :param df_rebinned: result of
     :param good_features:
     :return: concated df
     '''
     results = []
-    for df in df_woe:
+    for i, df in enumerate(df_woe):
         df = df[good_features]
         for ind in range(len(df_rebinned)):
-            df = pd.concat([df, df_rebinned[ind][0].iloc[:, -1]], axis=1)
+            df = pd.concat([df, df_rebinned[ind][i].iloc[:, -1]], axis=1)
         results.append(df)
     if len(results) == 1:
         return results[0]

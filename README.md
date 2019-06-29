@@ -8,6 +8,7 @@
     - calculate_psi (Расчет PSI (population stability index))
     - add_value_order (Сортировка признаков по их add value к модели)
     - two_bucket_dr (Расчет default rate модели при разбиении признака на 2 бакета)
+    - get_gini (Расчет значения GINI для каждого фактора для дальнейшего фильтра)
     
 2. woe_checker.py
     - get_bad_features
