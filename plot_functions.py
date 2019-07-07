@@ -52,7 +52,7 @@ def gini_distribution(*dfs, clf=False, date_column='', flag='', score_column='',
             except Exception:
                 DF = df.groupby(date_column).apply(lambda x: 2*roc_auc_score(x[flag], clf.predict(x.drop(cols_to_drop, axis=1)))-1)
 
-            plt_.pyplot.pyplot.plot(DF)
+            plt_.pyplot.plot(DF)
     else:
         for df in dfs:
             DF = df.groupby(date_column).apply(lambda x: 2 * roc_auc_score(x[flag], x[score_column]) - 1)
