@@ -12,18 +12,19 @@ def default_rate(*dfs, date_column='', flag='', legend=[]):
     :param legend: legend for plot
     :return: picture
     """
+    plt_ = __import__("matplotlib.pyplot")
     assert len(dfs) == len(legend), 'len(dfs) != len(legend)'
-    plt.figure(figsize=(16, 5))
+    fig, _ = plt_.pyplot.subplots(figsize=(16, 5))
     for df in dfs:
         DF = df.groupby(date_column).apply(lambda x: x[flag].value_counts())
         DF['DR'] = DF[1]/(DF[1] + DF[0])
 
-        plt.plot(DF.index, DF.DR)
+        plt_.pyplot.plot(DF.index, DF.DR)
 
-    plt.grid(alpha=0.2)
-    plt.legend(legend)
-    plt.title('Распределение уровня дефолтов в каждой выборке', fontsize=20)
-    plt.show()
+    plt_.pyplot.grid(alpha=0.2)
+    plt_.pyplot.legend(legend)
+    plt_.pyplot.title('Распределение уровня дефолтов в каждой выборке', fontsize=20)
+    plt_.pyplot.show()
     return
 
 
@@ -51,20 +52,20 @@ def gini_distribution(*dfs, clf=False, date_column='', flag='', score_column='',
             except Exception:
                 DF = df.groupby(date_column).apply(lambda x: 2*roc_auc_score(x[flag], clf.predict(x.drop(cols_to_drop, axis=1)))-1)
 
-            plt.plot(DF)
+            plt_.pyplot.pyplot.plot(DF)
     else:
         for df in dfs:
             DF = df.groupby(date_column).apply(lambda x: 2 * roc_auc_score(x[flag], x[score_column]) - 1)
 
-            plt.plot(DF)
+            plt_.pyplot.plot(DF)
 
-    plt.grid(alpha=0.2)
-    plt.ylabel('GINI', fontsize=20)
-    plt.legend(legend, loc='best')
-    plt.title('Распределение GINI в каждой выборке', fontsize=20)
+    plt_.pyplot.grid(alpha=0.2)
+    plt_.pyplot.ylabel('GINI', fontsize=20)
+    plt_.pyplot.legend(legend, loc='best')
+    plt_.pyplot.title('Распределение GINI в каждой выборке', fontsize=20)
     if ylim:
-        plt.ylim(ylim)
-    plt.show()
+        plt_.pyplot.ylim(ylim)
+    plt_.pyplot.show()
     return
 
 
@@ -133,10 +134,10 @@ def dr_distribution(df_train, df_test, df_tune, research_feature, flag_column):
     ax1.set_xlabel('WOE-значение фактора %s' % (research_feature), fontsize=15)
     ax2.set_ylabel('Уровень дефолтов', fontsize=15)
 
-    plt.title('Распределение фактора по бакетам (WOE) и динамика уровня дефолтов', fontsize=15)
-    plt.xticks(np.arange(len(vals)), vals, rotation=45)
-    plt.grid(alpha=0.2)
-    plt.show()
+    plt_.pyplot.title('Распределение фактора по бакетам (WOE) и динамика уровня дефолтов', fontsize=15)
+    plt_.pyplot.xticks(np.arange(len(vals)), vals, rotation=45)
+    plt_.pyplot.grid(alpha=0.2)
+    plt_.pyplot.show()
     return
 
 def add_value_plot(*ginies, feature_names, legend):
@@ -153,15 +154,15 @@ def add_value_plot(*ginies, feature_names, legend):
 
     fig, _ = plt_.pyplot.subplots(figsize=(16, 9))
     for gini in ginies:
-        plt.plot(range(1, len(gini) + 1), gini)
+        plt_.pyplot.plot(range(1, len(gini) + 1), gini)
 
-    plt.ylabel('GINI', fontsize=20)
-    plt.xlabel('features', fontsize=20)
-    plt.title('Add value', fontsize=20)
-    plt.grid(alpha=0.2)
+    plt_.pyplot.ylabel('GINI', fontsize=20)
+    plt_.pyplot.xlabel('features', fontsize=20)
+    plt_.pyplot.title('Add value', fontsize=20)
+    plt_.pyplot.grid(alpha=0.2)
 
-    plt.legend(legend, loc='lower right')
-    plt.xticks(range(1, len(ginies[0]) + 1), feature_names, rotation=90)
+    plt_.pyplot.legend(legend, loc='lower right')
+    plt_.pyplot.xticks(range(1, len(ginies[0]) + 1), feature_names, rotation=90)
 
     return
 
@@ -176,11 +177,11 @@ def plot_roc_auc_curve(*dfs, clf, cols_to_drop=[], flag_name='def_flag', labels=
     :param labels: list of labels for legend
     :return:
     """
-
+    plt_ = __import__("matplotlib.pyplot")
     model_name = str(clf)
     model_name = model_name[:model_name.find('(')]
 
-    fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+    fig, axes = plt_.pyplot.subplots(1, 2, figsize=(14, 6))
     aucs = []
     for df in dfs:
         X = df.drop(cols_to_drop, axis=1)
@@ -213,6 +214,6 @@ def plot_roc_auc_curve(*dfs, clf, cols_to_drop=[], flag_name='def_flag', labels=
     axes[1].set_xlabel("recall")
     axes[1].set_ylabel("precision")
     axes[1].set_title("Precision-Recall curve")
-    plt.tight_layout()
+    plt_.pyplot.tight_layout()
 
     return

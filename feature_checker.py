@@ -1,4 +1,4 @@
-from tqdm import tqdm
+from tqdm import tqdm, tqdm_notebook
 from sklearn.metrics import roc_auc_score
 import numpy as np
 import statsmodels.formula.api as smf
