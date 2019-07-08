@@ -1,4 +1,3 @@
-import matplotlib as plt
 import numpy as np
 from sklearn.metrics import roc_auc_score
 
@@ -69,7 +68,7 @@ def gini_distribution(*dfs, clf=False, date_column='', flag='', score_column='',
     return
 
 
-def dr_distribution(df_train, df_test, df_tune, research_feature, flag_column):
+def dr_distribution(df_train, df_test, df_tune, research_feature, flag_column, xticks = []):
     """
     Plot default rate distribution of your feature after WOE transformation
     :param research_feature: name of feature
@@ -135,7 +134,10 @@ def dr_distribution(df_train, df_test, df_tune, research_feature, flag_column):
     ax2.set_ylabel('Уровень дефолтов', fontsize=15)
 
     plt_.pyplot.title('Распределение фактора по бакетам (WOE) и динамика уровня дефолтов', fontsize=15)
-    plt_.pyplot.xticks(np.arange(len(vals)), vals, rotation=45)
+    if xticks:
+        plt_.pyplot.xticks(np.arange(len(vals)), xticks, rotation=45)
+    else:
+        plt_.pyplot.xticks(np.arange(len(vals)), vals, rotation=45)
     plt_.pyplot.grid(alpha=0.2)
     plt_.pyplot.show()
     return
