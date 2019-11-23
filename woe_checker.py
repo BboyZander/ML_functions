@@ -81,11 +81,8 @@ def woe_rebinning(df_train, df_test, df_oot, df_tune, cols_to_drop, bad, tol=0.0
         ginies = {}
         dfs = {}
 
-        for n_initial in range(2, 15):
-            try:
-                feature = woe_feature.split('WOE_')[1]
-            except Exception:
-                feature = woe_feature
+        for n_initial in range(2, 11):
+            feature = woe_feature.split('WOE_')[1]
             wings_0 = WingsOfEvidence(columns_to_apply=[feature], verbose=False, is_monotone=True, \
                                       n_initial=n_initial, n_target=2, optimizer='full-search', only_values=True)
 

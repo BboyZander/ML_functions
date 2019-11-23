@@ -1,3 +1,4 @@
+import matplotlib as plt
 import numpy as np
 from sklearn.metrics import roc_auc_score
 
@@ -135,9 +136,9 @@ def dr_distribution(df_train, df_test, df_tune, research_feature, flag_column, x
 
     plt_.pyplot.title('Распределение фактора по бакетам (WOE) и динамика уровня дефолтов', fontsize=15)
     if xticks:
-        plt_.pyplot.xticks(np.arange(len(vals)), xticks, rotation=45)
+        plt_.pyplot.xticks(np.arange(len(vals)), xticks, rotation=45, fontsize=20)
     else:
-        plt_.pyplot.xticks(np.arange(len(vals)), vals, rotation=45)
+        plt_.pyplot.xticks(np.arange(len(vals)), vals, rotation=45, fontsize=20)
     plt_.pyplot.grid(alpha=0.2)
     plt_.pyplot.show()
     return

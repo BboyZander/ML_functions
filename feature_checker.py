@@ -158,11 +158,12 @@ def calculate_psi(expected, actual, buckettype='bins', buckets=10, axis=0):
     return(psi_values)
 
 
-def add_value_order(df_train, df_test, df_tune, cols_to_drop, target_column, clf):
+def add_value_order(df_train, df_test, df_tune, cols_to_drop, target_column, clf, basic_columns = []):
     """
     return list of features sorted by add value
     :param target_column: name of target column
     :param clf: Classificator
+    :param basic_columns: columns names which you use such as basic for add value
     :return: sorted list of features
     """
 
@@ -173,19 +174,24 @@ def add_value_order(df_train, df_test, df_tune, cols_to_drop, target_column, clf
 
     model = clf
     while len(columns) != 0:
-        t = tqdm_notebook(columns, leave=False)
+        t = tqdm(columns, leave=False)
         for i, feature in enumerate(t):
-            model.fit(df_train[new_order + [feature]].values, df_train[target_column])
-
-            y_pred_train = model.predict_proba(df_train[new_order + [feature]])[:, 1]
-            y_pred_test = model.predict_proba(df_test[new_order + [feature]])[:, 1]
-            y_pred_tune = model.predict_proba(df_tune[new_order + [feature]])[:, 1]
+            model.fit(df_train[basic_columns + new_order + [feature]].values, df_train[target_column])
+            
+            try:
+                y_pred_train = model.predict_proba(df_train[basic_columns + new_order + [feature]])[:, 1]
+                y_pred_test = model.predict_proba(df_test[basic_columns + new_order + [feature]])[:, 1]
+                y_pred_tune = model.predict_proba(df_tune[basic_columns + new_order + [feature]])[:, 1]
+            except Exception:
+                y_pred_train = model.predict(df_train[basic_columns + new_order + [feature]])
+                y_pred_test = model.predict(df_test[basic_columns + new_order + [feature]])
+                y_pred_tune = model.predict(df_tune[basic_columns + new_order + [feature]])
 
             gini_train = (2*roc_auc_score(df_train.def_flag, y_pred_train) - 1)*100
             gini_test = (2*roc_auc_score(df_test.def_flag, y_pred_test) - 1)*100
             gini_tune = (2*roc_auc_score(df_tune.def_flag, y_pred_tune) - 1)*100
 
-            gginies.append((feature, gini_train, gini_test, gini_tune))
+            gginies.append((feature, gini_train, gini_test, gini_tune, model))
 
         g_features = [t for t in gginies if (t[1] > final_list[-1][1]) and (t[3] > final_list[-1][3])]
         if g_features == []:
