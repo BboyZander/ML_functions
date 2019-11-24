@@ -39,15 +39,16 @@ from sklearn.linear_model import LogisticRegression
 def validation(clf, X, y, n_folds=3, is_balance=True, random_state=123, verbose=1):
     '''
     Кросвалидация, тип балансировки данных - UnderSampling
-    :param ensemble: модель
+    :param clf: модель
     :param X: Данные для кросвалидации
     :param y: флаги меток
     :param n_folds: количество фолдов
-    :param balance: флаг балансировки
+    :param is_balance: флаг балансировки (True = RandomUnderSampler)
     :param random_state: random_state
     :verbose: количество выводимой информации
     :return: _
     '''
+
     rocs = []
     skf = StratifiedKFold(n_splits=n_folds, shuffle=True, random_state=random_state)
     model_name = str(clf)
@@ -93,21 +94,21 @@ def delete_correlated_features(df, cut_off=0.75, exclude=[]):
     # Select upper triangle of correlation matrix
     upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(np.bool))
 
-    # Plotting All correlations
-    if df.shape[1] <= 25:
-        f, ax = plt.subplots(figsize=(15, 10))
-        plt.title('All correlations', fontsize=20)
-        sns.heatmap(df.corr(), annot=True)
+    # # Plotting All correlations
+    # if df.shape[1] <= 25:
+    #     f, ax = plt.subplots(figsize=(15, 10))
+    #     plt.title('All correlations', fontsize=20)
+    #     sns.heatmap(df.corr(), annot=True)
 
     # Plotting highly correlated
     try:
         f, ax = plt.subplots(figsize=(15, 10))
         plt.title('High correlated', fontsize=20)
-        sns.heatmap(corr_matrix[(corr_matrix > cut_off) & (corr_matrix != 1)].dropna(axis=0, how='all').dropna(axis=1,
-                                                                                                               how='all'),
+        sns.heatmap(corr_matrix[(corr_matrix > cut_off) &
+                                (corr_matrix != 1)].dropna(axis=0, how='all').dropna(axis=1, how='all'),
                     annot=True, linewidths=.5)
     except:
-        print('No highly correlated features found')
+        print('There are no highly correlated features')
 
     # Find index of feature columns with correlation greater than cut_off
     to_drop = [column for column in upper.columns if any(upper[column] > cut_off)]
